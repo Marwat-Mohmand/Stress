@@ -1,0 +1,158 @@
+{% extends 'stress_app/base.html' %}
+{% load static %}
+
+{% block title %}Добавить участника в группу{% endblock %}
+
+{% block content %}
+<div class="demo-header">
+    <div class="query-info">
+        <i class="fas fa-users"></i>
+        <span>Управление группой: <strong>{{ group.name }}</strong></span>
+    </div>
+    <div class="demo-badge">
+        <i class="fas fa-user-plus"></i>
+        <span>Добавление участника</span>
+    </div>
+</div>
+
+<div class="form-container" style="max-width: 600px; margin: 0 auto;">
+    <div class="group-card" style="margin-bottom: 20px;">
+        <div class="group-header">
+            <div class="group-icon">
+                <i class="fas fa-users"></i>
+            </div>
+            <div class="group-title">
+                <h3>{{ group.name }}</h3>
+                <span class="member-count-badge">
+                    <i class="fas fa-user"></i> {{ group.members.count }}/{{ group.max_members }}
+                </span>
+            </div>
+        </div>
+        
+        <div class="group-description" style="margin: 15px 0;">
+            {{ group.description|default:"Нет описания" }}
+        </div>
+        
+        {% if group.meeting_schedule %}
+        <div class="meeting-info" style="margin-bottom: 15px;">
+            <i class="far fa-calendar-alt"></i> {{ group.meeting_schedule }}
+        </div>
+        {% endif %}
+    </div>
+
+    <div class="card" style="background: white; border-radius: 16px; padding: 30px; box-shadow: 0 4px 6px rgba(0,0,0,0.05);">
+        <h3 style="margin-bottom: 20px; color: #2d3748;">
+            <i class="fas fa-user-plus" style="color: #667eea; margin-right: 10px;"></i>
+            Добавить нового участника
+        </h3>
+        
+        <form method="POST">
+            {% csrf_token %}
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568;">
+                    Выберите пользователя:
+                </label>
+                <select name="user_id" required style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;">
+                    <option value="">-- Выберите пользователя --</option>
+                    {% for user in users %}
+                    <option value="{{ user.id }}">
+                        {{ user.username }} ({{ user.email }})
+                    </option>
+                    {% endfor %}
+                </select>
+            </div>
+            
+            <div style="margin-bottom: 20px;">
+                <label style="display: block; margin-bottom: 8px; font-weight: 600; color: #4a5568;">
+                    Роль в группе:
+                </label>
+                <select name="role" required style="width: 100%; padding: 12px; border: 2px solid #e2e8f0; border-radius: 8px; font-size: 1em;">
+                    <option value="member">Участник</option>
+                    <option value="moderator">Модератор</option>
+                    <option value="admin">Администратор</option>
+                </select>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 30px;">
+                <button type="submit" style="flex: 1; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer; transition: transform 0.2s;">
+                    <i class="fas fa-user-plus"></i> Добавить участника
+                </button>
+                <a href="{% url 'group-list' %}" style="flex: 1; background: #a0aec0; color: white; padding: 14px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: 600; transition: transform 0.2s;">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+    
+    <div class="info-card" style="margin-top: 30px;">
+        <div class="info-icon">
+            <i class="fas fa-link"></i>
+        </div>
+        <div class="info-content">
+            <h3>ManyToMany с through параметром</h3>
+            <p>Эта операция использует <strong>ManyToManyField</strong> с промежуточной моделью <strong>GroupMembership</strong> и параметром <strong>through_fields = ('group', 'user')</strong>.</p>
+            <p>При добавлении участника через <code>group.members.add(user, through_defaults={'role': role})</code>, Django автоматически создает запись в промежуточной таблице с дополнительными полями (роль, дата присоединения).</p>
+        </div>
+    </div>
+</div>
+
+<style>
+    .group-card {
+        background: white;
+        border-radius: 16px;
+        padding: 25px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+        border: 1px solid #e2e8f0;
+    }
+    
+    .group-header {
+        display: flex;
+        align-items: center;
+        gap: 15px;
+    }
+    
+    .group-icon {
+        width: 50px;
+        height: 50px;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 12px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: white;
+        font-size: 1.5em;
+    }
+    
+    .group-title {
+        flex: 1;
+    }
+    
+    .group-title h3 {
+        margin: 0;
+        color: #2d3748;
+        font-size: 1.3em;
+    }
+    
+    .member-count-badge {
+        background: #e2e8f0;
+        padding: 4px 10px;
+        border-radius: 50px;
+        font-size: 0.85em;
+        color: #4a5568;
+    }
+    
+    .meeting-info {
+        background: #f7fafc;
+        padding: 10px;
+        border-radius: 8px;
+        color: #4a5568;
+        display: inline-block;
+    }
+    
+    button:hover, a:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    }
+</style>
+{% endblock %}

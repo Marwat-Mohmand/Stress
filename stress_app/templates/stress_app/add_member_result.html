@@ -1,0 +1,26 @@
+{% extends 'stress_app/base.html' %}
+
+{% block title %}Add Member Result{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-user-plus"></i> Add Member Result</h2>
+
+<div class="card">
+    <div class="crud-message" style="text-align: center;">
+        {% if '✅' in message %}
+            <i class="fas fa-check-circle" style="color: #48bb78; font-size: 3em; margin-bottom: 20px;"></i>
+        {% else %}
+            <i class="fas fa-info-circle" style="color: #667eea; font-size: 3em; margin-bottom: 20px;"></i>
+        {% endif %}
+        
+        <p style="font-size: 1.2em;">{{ message }}</p>
+    </div>
+</div>
+
+<div class="card">
+    <h3><i class="fas fa-link"></i> ManyToMany with through</h3>
+    <p>This demonstrates using <strong>ManyToManyField</strong> with a custom intermediate model (<strong>GroupMembership</strong>) using the <strong>through</strong> parameter.</p>
+    <p>The intermediate model stores additional data like the member's <strong>role</strong> and <strong>join date</strong>.</p>
+    <p><code>through_fields = ('group', 'user')</code> specifies which fields in the intermediate model point to the two related models.</p>
+</div>
+{% endblock %}

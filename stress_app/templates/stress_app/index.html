@@ -1,0 +1,208 @@
+{% extends 'stress_app/base.html' %}
+{% load static %}
+
+{% block title %}Главная - Управление стрессом{% endblock %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{% static 'css/main.css' %}">
+{% endblock %}
+
+{% block content %}
+<!-- Hero Section -->
+<section class="hero">
+    <div class="hero-content">
+        <h1>Управление стрессом</h1>
+        <p>Найдите свой путь к спокойствию и гармонии</p>
+        <div class="stats">
+            <div class="stat">
+                <span class="stat-number">{{ total_resources }}</span>
+                <span class="stat-label">ресурсов</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">{{ total_experts }}</span>
+                <span class="stat-label">экспертов</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">{{ total_users }}</span>
+                <span class="stat-label">пользователей</span>
+            </div>
+            <div class="stat">
+                <span class="stat-number">{{ avg_views }}</span>
+                <span class="stat-label">ср. просмотров</span>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- Search Bar -->
+<section class="search-section">
+    <div class="container">
+        <form action="{% url 'search' %}" method="GET" class="search-form">
+            <input type="text" name="q" placeholder="Поиск ресурсов, экспертов, групп..." required>
+            <button type="submit">🔍 Найти</button>
+        </form>
+    </div>
+</section>
+
+<!-- Widget 1: Latest Resources -->
+<section class="widget">
+    <div class="container">
+        <div class="widget-header">
+            <h2><i class="fas fa-clock"></i> Новые ресурсы</h2>
+            <a href="{% url 'resource-list' %}" class="view-all">Все ресурсы →</a>
+        </div>
+        <div class="resources-grid">
+            {% for resource in latest_resources %}
+            <div class="resource-card">
+                {% if resource.cover_image %}
+                <img src="{{ resource.cover_image.url }}" alt="{{ resource.title }}" class="resource-image">
+                {% else %}
+                <div class="resource-image-placeholder">
+                    <i class="fas fa-brain"></i>
+                </div>
+                {% endif %}
+                <div class="resource-info">
+                    <h3>
+                        <a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a>
+                    </h3>
+                    <div class="resource-meta">
+                        <span><i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}</span>
+                        <span><i class="far fa-clock"></i> {{ resource.duration }} мин</span>
+                        <span><i class="fas fa-tag"></i> {{ resource.get_resource_type_display }}</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="favorite-btn" data-id="{{ resource.id }}" data-type="resource">
+                            <i class="far fa-heart"></i> В избранное
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% empty %}
+            <p>Нет ресурсов</p>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Widget 2: Popular Resources -->
+<section class="widget">
+    <div class="container">
+        <div class="widget-header">
+            <h2><i class="fas fa-fire"></i> Популярные ресурсы</h2>
+            <a href="{% url 'resource-list' %}" class="view-all">Все ресурсы →</a>
+        </div>
+        <div class="resources-grid">
+            {% for resource in popular_resources %}
+            <div class="resource-card">
+                {% if resource.cover_image %}
+                <img src="{{ resource.cover_image.url }}" alt="{{ resource.title }}" class="resource-image">
+                {% else %}
+                <div class="resource-image-placeholder">
+                    <i class="fas fa-star"></i>
+                </div>
+                {% endif %}
+                <div class="resource-info">
+                    <h3>
+                        <a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a>
+                    </h3>
+                    <div class="resource-meta">
+                        <span><i class="fas fa-eye"></i> {{ resource.views_count }} просмотров</span>
+                        <span><i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}</span>
+                    </div>
+                    <div class="resource-actions">
+                        <button class="favorite-btn" data-id="{{ resource.id }}" data-type="resource">
+                            <i class="far fa-heart"></i> В избранное
+                        </button>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Widget 3: Expert Recommendations -->
+<section class="widget">
+    <div class="container">
+        <div class="widget-header">
+            <h2><i class="fas fa-user-tie"></i> Наши эксперты</h2>
+            <a href="{% url 'expert-list' %}" class="view-all">Все эксперты →</a>
+        </div>
+        <div class="experts-grid">
+            {% for expert in expert_recommendations %}
+            <div class="expert-card">
+                {% if expert.photo %}
+                <img src="{{ expert.photo.url }}" alt="{{ expert.name }}" class="expert-image">
+                {% else %}
+                <div class="expert-image-placeholder">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                {% endif %}
+                <h3>{{ expert.name }}</h3>
+                <p class="expert-specialty">{{ expert.specialty }}</p>
+                <div class="expert-stats">
+                    <span><i class="fas fa-book-open"></i> {{ expert.resources_count }} ресурсов</span>
+                </div>
+                <a href="{% url 'expert-detail' expert.id %}" class="btn-outline">Подробнее</a>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</section>
+
+<!-- Featured Resource -->
+{% if featured_resource %}
+<section class="featured">
+    <div class="container">
+        <div class="featured-card">
+            <div class="featured-content">
+                <span class="featured-badge">⭐ Рекомендуем</span>
+                <h2>{{ featured_resource.title }}</h2>
+                <p>{{ featured_resource.content|truncatewords:30 }}</p>
+                <div class="featured-meta">
+                    <span><i class="fas fa-user-md"></i> {{ featured_resource.expert.name|default:"Эксперт" }}</span>
+                    <span><i class="far fa-clock"></i> {{ featured_resource.duration }} мин</span>
+                </div>
+                <a href="{% url 'resource-detail-page' featured_resource.id %}" class="btn-primary">Читать далее →</a>
+            </div>
+            {% if featured_resource.cover_image %}
+            <img src="{{ featured_resource.cover_image.url }}" alt="{{ featured_resource.title }}" class="featured-image">
+            {% endif %}
+        </div>
+    </div>
+</section>
+{% endif %}
+
+<!-- Populate Database Message -->
+<div style="text-align: center; margin: 20px 0; padding: 20px; background: #f7fafc; border-radius: 12px;">
+    <p><i class="fas fa-database"></i> В базе данных: <strong>{{ total_resources }}</strong> ресурсов, 
+    <strong>{{ total_experts }}</strong> экспертов, 
+    <strong>{{ total_users }}</strong> пользователей</p>
+    <p><small>Среднее количество просмотров: {{ avg_views }}</small></p>
+</div>
+
+{% block extra_js %}
+<script>
+// Favorite button functionality (JavaScript for frontend, will be connected to database later)
+document.querySelectorAll('.favorite-btn').forEach(btn => {
+    btn.addEventListener('click', function() {
+        const icon = this.querySelector('i');
+        if (icon.classList.contains('far')) {
+            icon.classList.remove('far');
+            icon.classList.add('fas');
+            icon.style.color = '#f56565';
+            this.style.background = '#fff5f5';
+            // Here you would send AJAX request to save to database
+            console.log('Added to favorites:', this.dataset.id);
+        } else {
+            icon.classList.remove('fas');
+            icon.classList.add('far');
+            icon.style.color = '#cbd5e0';
+            // Here you would send AJAX request to remove from database
+            console.log('Removed from favorites:', this.dataset.id);
+        }
+    });
+});
+</script>
+{% endblock %}
+{% endblock %}

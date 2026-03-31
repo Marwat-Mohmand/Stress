@@ -1,0 +1,59 @@
+{% extends 'stress_app/base.html' %}
+{% load static %}
+
+{% block title %}Удаление участника{% endblock %}
+
+{% block content %}
+<div class="demo-header">
+    <div class="query-info">
+        <i class="fas fa-users"></i>
+        <span>Управление группой: <strong>{{ group.name }}</strong></span>
+    </div>
+    <div class="demo-badge" style="background: linear-gradient(135deg, #f56565 0%, #c53030 100%);">
+        <i class="fas fa-user-minus"></i>
+        <span>Удаление участника</span>
+    </div>
+</div>
+
+<div class="form-container" style="max-width: 500px; margin: 40px auto;">
+    <div class="group-card" style="text-align: center;">
+        <div style="font-size: 4em; color: #f56565; margin-bottom: 20px;">
+            <i class="fas fa-exclamation-triangle"></i>
+        </div>
+        
+        <h2 style="color: #2d3748; margin-bottom: 15px;">Подтвердите удаление</h2>
+        
+        <div style="background: #f7fafc; border-radius: 12px; padding: 20px; margin-bottom: 25px;">
+            <div style="display: flex; align-items: center; gap: 15px; margin-bottom: 15px;">
+                <div style="font-size: 3em; color: #9f7aea;">
+                    <i class="fas fa-user-circle"></i>
+                </div>
+                <div style="text-align: left;">
+                    <div style="font-size: 1.2em; font-weight: 600;">{{ user.username }}</div>
+                    <div style="color: #718096;">{{ user.email }}</div>
+                </div>
+            </div>
+            
+            <p style="font-size: 1.1em;">
+                из группы <strong>{{ group.name }}</strong>
+            </p>
+        </div>
+        
+        <p style="color: #4a5568; margin-bottom: 25px;">
+            Это действие нельзя отменить!
+        </p>
+        
+        <form method="POST">
+            {% csrf_token %}
+            <div style="display: flex; gap: 15px;">
+                <button type="submit" style="flex: 1; background: #f56565; color: white; padding: 14px; border: none; border-radius: 8px; font-size: 1.1em; font-weight: 600; cursor: pointer;">
+                    <i class="fas fa-trash"></i> Да, удалить
+                </button>
+                <a href="{% url 'group-list' %}" style="flex: 1; background: #a0aec0; color: white; padding: 14px; border-radius: 8px; text-decoration: none; text-align: center; font-weight: 600;">
+                    <i class="fas fa-times"></i> Отмена
+                </a>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

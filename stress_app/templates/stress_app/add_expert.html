@@ -1,0 +1,47 @@
+{% extends 'stress_app/base.html' %}
+
+{% block title %}Add Expert{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-user-plus"></i> Add New Expert</h2>
+
+<div class="card">
+    <form method="POST">
+        {% csrf_token %}
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Name:</label>
+            <input type="text" name="name" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Specialty:</label>
+            <input type="text" name="specialty" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Qualification:</label>
+            <input type="text" name="qualification" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Email:</label>
+            <input type="email" name="email" required style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;">
+        </div>
+        
+        <div style="margin-bottom: 15px;">
+            <label style="display: block; margin-bottom: 5px; font-weight: bold;">Bio:</label>
+            <textarea name="bio" rows="4" style="width: 100%; padding: 10px; border: 1px solid #e2e8f0; border-radius: 8px;"></textarea>
+        </div>
+        
+        <div style="margin-top: 20px;">
+            <button type="submit" style="background: #48bb78; color: white; padding: 12px 25px; border: none; border-radius: 50px; cursor: pointer;">
+                <i class="fas fa-save"></i> Save Expert
+            </button>
+            <a href="{% url 'expert-list' %}" style="margin-left: 10px; background: #a0aec0; color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none;">
+                Cancel
+            </a>
+        </div>
+    </form>
+</div>
+{% endblock %}

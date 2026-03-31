@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+{% load static %} 
+{% load static %}
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}Платформа управления стрессом{% endblock %}</title>
+    <link rel="stylesheet" href="{% static 'css/style.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+<body>
+    <div class="wrapper">
+        <!-- Header with navigation -->
+       <!-- In base.html, update navigation -->
+<header class="main-header">
+    <div class="container">
+        <div class="logo">
+            <i class="fas fa-brain"></i>
+            <a href="{% url 'index' %}" style="text-decoration: none; color: white;">
+                <h1>Управление стрессом</h1>
+            </a>
+        </div>
+        <nav class="main-nav">
+            <a href="{% url 'index' %}">Главная</a>
+            <a href="{% url 'resource-list' %}">Ресурсы</a>
+            <a href="{% url 'group-list' %}">Группы</a>
+            <a href="{% url 'expert-list' %}">Эксперты</a>
+        </nav>
+    </div>
+</header>
+
+        <!-- Navigation tabs -->
+        <div class="nav-tabs container">
+            <a href="{% url 'resource-list' %}" class="tab {% if request.resolver_match.url_name == 'resource-list' %}active{% endif %}">
+                <i class="fas fa-book-open"></i>
+                <span>Ресурсы</span>
+                <small>select_related</small>
+            </a>
+            <a href="{% url 'group-list' %}" class="tab {% if request.resolver_match.url_name == 'group-list' %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Группы</span>
+                <small>prefetch_related</small>
+            </a>
+            <a href="{% url 'expert-list' %}" class="tab {% if request.resolver_match.url_name == 'expert-list' %}active{% endif %}">
+                <i class="fas fa-user-md"></i>
+                <span>Эксперты</span>
+                <small>CRUD операции</small>
+            </a>
+            <a href="/admin/" class="tab" target="_blank">
+                <i class="fas fa-cog"></i>
+                <span>Админ</span>
+                <small>панель</small>
+            </a>
+        </div>
+
+        <!-- Main content -->
+        <main class="main-content container">
+            {% block content %}{% endblock %}
+        </main>
+
+        <!-- Footer -->
+        <footer class="main-footer">
+            <div class="container">
+                <p>© 2026 - Демонстрация Django ORM</p>
+                <p class="tech-info">Django 6.0.2 | SQLite | Python 3.13</p>
+            </div>
+        </footer>
+    </div>
+</body>
+</html>

@@ -1,0 +1,101 @@
+{% extends 'stress_app/base.html' %}
+{% load static %}
+
+{% block title %}Результаты поиска{% endblock %}
+
+{% block content %}
+<div class="container" style="padding: 40px 20px;">
+    <div class="search-header" style="margin-bottom: 30px;">
+        <h1>Результаты поиска</h1>
+        <p>По запросу: <strong>"{{ query }}"</strong> найдено <strong>{{ total_results }}</strong> результатов</p>
+        
+        <!-- Search type filter -->
+        <div class="search-filters" style="margin: 20px 0; display: flex; gap: 10px;">
+            <a href="?q={{ query }}&type=all" class="filter-btn {% if search_type == 'all' %}active{% endif %}">Все</a>
+            <a href="?q={{ query }}&type=resources" class="filter-btn {% if search_type == 'resources' %}active{% endif %}">Ресурсы</a>
+            <a href="?q={{ query }}&type=experts" class="filter-btn {% if search_type == 'experts' %}active{% endif %}">Эксперты</a>
+            <a href="?q={{ query }}&type=groups" class="filter-btn {% if search_type == 'groups' %}active{% endif %}">Группы</a>
+        </div>
+    </div>
+    
+    <!-- Resources Results -->
+    {% if resources_results %}
+    <div class="results-section" style="margin-bottom: 40px;">
+        <h2><i class="fas fa-book-open"></i> Ресурсы ({{ resources_results|length }})</h2>
+        <div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            {% for resource in resources_results %}
+            <div class="resource-card" style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3><a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a></h3>
+                <p>{{ resource.content|truncatewords:20 }}</p>
+                <div style="margin-top: 10px; color: #718096; font-size: 0.9rem;">
+                    <span><i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}</span>
+                    <span style="margin-left: 15px;"><i class="far fa-clock"></i> {{ resource.duration }} мин</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Experts Results -->
+    {% if experts_results %}
+    <div class="results-section" style="margin-bottom: 40px;">
+        <h2><i class="fas fa-user-md"></i> Эксперты ({{ experts_results|length }})</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+            {% for expert in experts_results %}
+            <div style="background: white; border-radius: 12px; padding: 20px; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3>{{ expert.name }}</h3>
+                <p style="color: #667eea;">{{ expert.specialty }}</p>
+                <p style="font-size: 0.9rem;">{{ expert.bio|truncatewords:20 }}</p>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    <!-- Groups Results -->
+    {% if groups_results %}
+    <div class="results-section">
+        <h2><i class="fas fa-users"></i> Группы поддержки ({{ groups_results|length }})</h2>
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
+            {% for group in groups_results %}
+            <div style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
+                <h3>{{ group.name }}</h3>
+                <p>{{ group.description|truncatewords:30 }}</p>
+                <div style="margin-top: 10px; color: #718096;">
+                    <span><i class="fas fa-user"></i> {{ group.members.count }}/{{ group.max_members }}</span>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+    {% endif %}
+    
+    {% if not resources_results and not experts_results and not groups_results %}
+    <div style="text-align: center; padding: 60px; background: #f7fafc; border-radius: 16px;">
+        <i class="fas fa-search" style="font-size: 3rem; color: #cbd5e0;"></i>
+        <h3>Ничего не найдено</h3>
+        <p>Попробуйте изменить поисковый запрос</p>
+        <a href="{% url 'index' %}" class="btn-primary">Вернуться на главную</a>
+    </div>
+    {% endif %}
+</div>
+
+<style>
+.filter-btn {
+    padding: 8px 20px;
+    background: #f7fafc;
+    border-radius: 50px;
+    text-decoration: none;
+    color: #4a5568;
+    transition: all 0.2s;
+}
+.filter-btn.active {
+    background: #667eea;
+    color: white;
+}
+.filter-btn:hover:not(.active) {
+    background: #e2e8f0;
+}
+</style>
+{% endblock %}

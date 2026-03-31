@@ -1,0 +1,74 @@
+
+
+{% extends 'stress_app/base.html' %}
+
+{% block title %}Expert Management{% endblock %}
+
+{% block content %}
+<h2><i class="fas fa-user-md"></i> Expert Management</h2>
+
+{% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-{{ message.tags }}" style="padding: 15px; margin: 15px 0; border-radius: 8px; background: {% if message.tags == 'success' %}#48bb78{% else %}#f56565{% endif %}; color: white;">
+        {{ message }}
+    </div>
+    {% endfor %}
+{% endif %}
+
+<div style="margin-bottom: 20px;">
+    <a href="{% url 'add-expert' %}" class="btn" style="background: #48bb78; color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; display: inline-block;">
+        <i class="fas fa-plus-circle"></i> Add New Expert
+    </a>
+</div>
+
+<div class="card">
+    <h3><i class="fas fa-list"></i> Experts List ({{ experts|length }} total)</h3>
+    
+    <table style="width: 100%; border-collapse: collapse;">
+        <thead>
+            <tr style="background: #f7fafc; border-bottom: 2px solid #e2e8f0;">
+                <th style="padding: 12px; text-align: left;">Name</th>
+                <th style="padding: 12px; text-align: left;">Specialty</th>
+                <th style="padding: 12px; text-align: left;">Qualification</th>
+                <th style="padding: 12px; text-align: left;">Email</th>
+                <th style="padding: 12px; text-align: left;">Join Date</th>
+                <th style="padding: 12px; text-align: left;">Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for expert in experts %}
+            <tr style="border-bottom: 1px solid #e2e8f0;">
+                <td style="padding: 12px;">{{ expert.name }}</td>
+                <td style="padding: 12px;">{{ expert.specialty }}</td>
+                <td style="padding: 12px;">{{ expert.qualification }}</td>
+                <td style="padding: 12px;">{{ expert.email }}</td>
+                <td style="padding: 12px;">{{ expert.join_date|date:"M d, Y" }}</td>
+                <td style="padding: 12px;">
+                    <a href="{% url 'edit-expert' expert.id %}" style="color: #4299e1; margin-right: 10px;">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a href="{% url 'delete-expert' expert.id %}" style="color: #f56565;">
+                        <i class="fas fa-trash"></i> Delete
+                    </a>
+                </td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="6" style="padding: 20px; text-align: center;">No experts found. Add one!</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<!-- Navigation Links - FIXED: Removed 'crud-demo' -->
+<div style="margin-top: 30px; text-align: center; padding: 20px;">
+    <a href="{% url 'resource-list' %}" style="margin: 0 10px; color: #667eea;">View Resources</a>
+    <a href="{% url 'group-list' %}" style="margin: 0 10px; color: #667eea;">View Groups</a>
+    <a href="/admin/" target="_blank" style="margin: 0 10px; color: #667eea;">Admin Panel</a>
+</div>
+
+<div style="margin-top: 30px; text-align: center;">
+    <p><strong>Check Admin Panel:</strong> Go to <a href="/admin/stress_app/expert/" target="_blank">Admin → Experts</a> to see the same data!</p>
+</div>
+{% endblock %}

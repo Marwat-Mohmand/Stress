@@ -1,0 +1,531 @@
+{% extends 'stress_app/base.html' %}
+{% load static %}
+
+{% block title %}Группы поддержки - Демо prefetch_related{% endblock %}
+
+{% block content %}
+<div class="demo-header">
+    <div class="query-info">
+        <i class="fas fa-database"></i>
+        <span>Количество запросов к БД: <strong>{{ num_queries }}</strong></span>
+    </div>
+    <div class="demo-badge" style="background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);">
+        <i class="fas fa-users"></i>
+        <span>Демонстрация prefetch_related()</span>
+    </div>
+</div>
+
+<h2 class="section-title">
+    <i class="fas fa-users" style="color: #9f7aea;"></i>
+    Группы поддержки <span class="title-badge">{{ groups_data|length }} групп</span>
+</h2>
+
+<div class="groups-grid">
+    {% for item in groups_data %}
+    <div class="group-card">
+        <!-- Card Header with gradient -->
+        <div class="group-card-header" style="background: linear-gradient(135deg, {% if item.group.is_private %} #f56565 {% else %} #9f7aea {% endif %} 0%, {% if item.group.is_private %} #e53e3e {% else %} #805ad5 {% endif %} 100%);">
+            <div class="group-type-icon">
+                {% if item.group.is_private %}
+                <i class="fas fa-lock"></i>
+                {% else %}
+                <i class="fas fa-globe"></i>
+                {% endif %}
+            </div>
+            <div class="group-header-content">
+                <h3 class="group-name">{{ item.group.name }}</h3>
+                <div class="group-meta">
+                    <span class="group-meta-item">
+                        <i class="fas fa-calendar-alt"></i> {{ item.group.created_date|date:"d.m.Y" }}
+                    </span>
+                    <span class="group-meta-item">
+                        <i class="fas fa-user-tie"></i> {{ item.group.moderator.username|default:"Нет модератора" }}
+                    </span>
+                </div>
+            </div>
+            <div class="member-count-large">
+                <span class="member-count-number">{{ item.member_count }}</span>
+                <span class="member-count-label">/{{ item.group.max_members }}</span>
+            </div>
+        </div>
+
+        <!-- Card Body -->
+        <div class="group-card-body">
+            <!-- Description -->
+            <div class="group-description">
+                <i class="fas fa-quote-left" style="color: #cbd5e0; margin-right: 8px;"></i>
+                {{ item.group.description|default:"Нет описания группы" }}
+            </div>
+
+            <!-- Members Section -->
+            <div class="members-section">
+                <h4 class="members-title">
+                    <i class="fas fa-user-friends"></i> 
+                    Участники группы <span class="member-count-badge">{{ item.member_count }}</span>
+                </h4>
+                
+                <div class="members-grid">
+                    {% if item.members %}
+                        {% for member in item.members %}
+                        <div class="member-card">
+                            <div class="member-avatar">
+                                <i class="fas fa-user-circle"></i>
+                            </div>
+                            <div class="member-info">
+                                <div class="member-name">{{ member.username }}</div>
+                                <div class="member-email">{{ member.email|truncatechars:20 }}</div>
+                                <div class="member-joined">
+                                    <i class="far fa-clock"></i> 
+                                    {% with membership=item.group.memberships.all|dictsort:"join_date"|first %}
+                                        {{ membership.join_date|date:"d.m.Y" }}
+                                    {% endwith %}
+                                </div>
+                            </div>
+                            <div class="member-actions">
+                                <!-- Remove member button -->
+                                <a href="{% url 'remove-group-member' item.group.id member.id %}" 
+                                   class="member-remove-btn" 
+                                   onclick="return confirm('Удалить участника {{ member.username }} из группы?')"
+                                   title="Удалить участника">
+                                    <i class="fas fa-times-circle"></i>
+                                </a>
+                            </div>
+                            {% if member != item.group.moderator %}
+                            <div class="member-role">
+                                {% if member.username == item.group.moderator.username %}
+                                    <span class="role-badge role-moderator">Модератор</span>
+                                {% else %}
+                                    <span class="role-badge role-member">Участник</span>
+                                {% endif %}
+                            </div>
+                            {% endif %}
+                        </div>
+                        {% endfor %}
+                    {% else %}
+                    <div class="empty-members">
+                        <i class="fas fa-user-slash"></i>
+                        <p>В группе пока нет участников</p>
+                        <p style="font-size: 0.9em; color: #a0aec0;">Будьте первым, кто присоединится!</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <!-- Meeting Schedule (if available) -->
+            {% if item.group.meeting_schedule %}
+            <div class="meeting-schedule">
+                <i class="fas fa-video"></i>
+                <span>{{ item.group.meeting_schedule }}</span>
+            </div>
+            {% endif %}
+
+            <!-- Tags (if available) -->
+            {% if item.group.tags %}
+            <div class="group-tags">
+                {% for tag in item.group.tags|slice:":3" %}
+                <span class="tag">#{{ tag }}</span>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+
+        <!-- Card Footer with Actions -->
+        <div class="group-card-footer">
+            <a href="{% url 'add-group-member' item.group.id %}" class="btn-action btn-primary">
+                <i class="fas fa-user-plus"></i>
+                Добавить участника
+            </a>
+            
+            <!-- View Details Button (optional) -->
+            <button class="btn-action btn-outline" onclick="alert('Детали группы: {{ item.group.name }}')">
+                <i class="fas fa-info-circle"></i>
+                Детали
+            </button>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Info Card about prefetch_related -->
+<div class="info-card" style="margin-top: 40px; border-left: 5px solid #9f7aea;">
+    <div class="info-icon" style="color: #9f7aea;">
+        <i class="fas fa-code"></i>
+    </div>
+    <div class="info-content">
+        <h3 style="color: #553c9a;">Что такое prefetch_related?</h3>
+        <p><strong>prefetch_related()</strong> используется для оптимизации запросов к связанным объектам (ManyToMany и обратные ForeignKey).</p>
+        
+        <div class="comparison">
+            <div class="comparison-item bad">
+                <i class="fas fa-times-circle"></i>
+                <strong>Без оптимизации:</strong>
+                <span>{{ groups_data|length|add:"1" }}+ запросов</span>
+                <small>(N+1 проблема)</small>
+            </div>
+            <div class="comparison-item good">
+                <i class="fas fa-check-circle"></i>
+                <strong>С prefetch_related:</strong>
+                <span>всего 2 запроса</span>
+                <small>(независимо от количества групп)</small>
+            </div>
+        </div>
+        
+        <div class="code-block" style="background: #2d3748; color: #e2e8f0; padding: 15px; border-radius: 8px; margin-top: 15px; font-family: monospace;">
+            <span style="color: #9f7aea;">SupportGroup.objects</span>.<span style="color: #48bb78;">prefetch_related</span>(<span style="color: #fbbf24;">'memberships__user'</span>).all()
+        </div>
+    </div>
+</div>
+
+
+<style>
+/* Groups Page Specific Styles */
+.groups-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+    gap: 25px;
+    margin-top: 20px;
+}
+
+.group-card {
+    background: white;
+    border-radius: 20px;
+    overflow: hidden;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    border: 1px solid #e2e8f0;
+}
+
+.group-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+.group-card-header {
+    padding: 20px;
+    color: white;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    position: relative;
+}
+
+.group-type-icon {
+    width: 50px;
+    height: 50px;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.8em;
+    backdrop-filter: blur(5px);
+}
+
+.group-header-content {
+    flex: 1;
+}
+
+.group-name {
+    font-size: 1.3em;
+    font-weight: 600;
+    margin-bottom: 5px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.group-meta {
+    display: flex;
+    gap: 15px;
+    font-size: 0.8em;
+    opacity: 0.95;
+}
+
+.group-meta-item {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+.member-actions {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.member-remove-btn {
+    color: #f56565;
+    font-size: 1.2em;
+    transition: all 0.2s ease;
+    text-decoration: none;
+}
+
+.member-remove-btn:hover {
+    color: #c53030;
+    transform: scale(1.1);
+}
+
+.member-count-large {
+    background: rgba(255, 255, 255, 0.25);
+    border-radius: 50px;
+    padding: 8px 15px;
+    display: flex;
+    align-items: baseline;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.member-count-number {
+    font-size: 1.8em;
+    font-weight: 700;
+    line-height: 1;
+}
+
+.member-count-label {
+    font-size: 1em;
+    opacity: 0.9;
+    margin-left: 3px;
+}
+
+.group-card-body {
+    padding: 20px;
+}
+
+.group-description {
+    background: #f7fafc;
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 20px;
+    color: #4a5568;
+    font-style: italic;
+    border-left: 3px solid #9f7aea;
+}
+
+.members-section {
+    margin-bottom: 20px;
+}
+
+.members-title {
+    font-size: 1.1em;
+    color: #2d3748;
+    margin-bottom: 15px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.members-title i {
+    color: #9f7aea;
+}
+
+.members-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+    gap: 10px;
+    max-height: 300px;
+    overflow-y: auto;
+    padding: 5px;
+}
+
+.member-card {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #e2e8f0;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.member-card:hover {
+    background: white;
+    border-color: #9f7aea;
+    transform: translateX(2px);
+}
+
+.member-avatar {
+    color: #9f7aea;
+    font-size: 2em;
+}
+
+.member-info {
+    flex: 1;
+    min-width: 0;
+}
+
+.member-name {
+    font-weight: 600;
+    color: #2d3748;
+    font-size: 0.95em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-email {
+    font-size: 0.7em;
+    color: #718096;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.member-joined {
+    font-size: 0.7em;
+    color: #a0aec0;
+    display: flex;
+    align-items: center;
+    gap: 3px;
+    margin-top: 2px;
+}
+
+.role-badge {
+    font-size: 0.6em;
+    padding: 2px 6px;
+    border-radius: 50px;
+    white-space: nowrap;
+}
+
+.role-moderator {
+    background: #9f7aea;
+    color: white;
+}
+
+.role-member {
+    background: #cbd5e0;
+    color: #2d3748;
+}
+
+.empty-members {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 30px;
+    color: #a0aec0;
+}
+
+.empty-members i {
+    font-size: 3em;
+    margin-bottom: 10px;
+}
+
+.meeting-schedule {
+    background: #f0f5ff;
+    padding: 12px;
+    border-radius: 8px;
+    color: #4a5568;
+    font-size: 0.9em;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 15px;
+}
+
+.meeting-schedule i {
+    color: #9f7aea;
+}
+
+.group-tags {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.tag {
+    background: #e2e8f0;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.8em;
+    color: #4a5568;
+}
+
+.group-card-footer {
+    padding: 15px 20px;
+    background: #f7fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    gap: 10px;
+}
+
+.btn-action {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    text-decoration: none;
+    font-size: 0.95em;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #9f7aea 0%, #805ad5 100%);
+    color: white;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(159, 122, 234, 0.4);
+}
+
+.btn-outline {
+    background: white;
+    border: 1px solid #e2e8f0;
+    color: #4a5568;
+}
+
+.btn-outline:hover {
+    background: #f7fafc;
+    border-color: #cbd5e0;
+}
+
+.title-badge {
+    background: #9f7aea;
+    color: white;
+    font-size: 0.6em;
+    padding: 4px 12px;
+    border-radius: 50px;
+    margin-left: 10px;
+}
+
+/* Scrollbar styling */
+.members-grid::-webkit-scrollbar {
+    width: 6px;
+}
+
+.members-grid::-webkit-scrollbar-track {
+    background: #f1f1f1;
+    border-radius: 10px;
+}
+
+.members-grid::-webkit-scrollbar-thumb {
+    background: #cbd5e0;
+    border-radius: 10px;
+}
+
+.members-grid::-webkit-scrollbar-thumb:hover {
+    background: #9f7aea;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .groups-grid {
+        grid-template-columns: 1fr;
+    }
+    
+    .group-card-header {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .member-count-large {
+        position: absolute;
+        top: 10px;
+        right: 10px;
+    }
+}
+</style>
+{% endblock %}
