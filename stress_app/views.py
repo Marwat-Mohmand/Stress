@@ -6,7 +6,7 @@ from django.utils import timezone
 from django.http import HttpResponseRedirect
 from django.urls import reverse
 from .models import Resource, SupportGroup, GroupMembership, User, Expert, Category
-from django.db.models import Count, Avg, Q
+from django.db.models import F, Q, Count, Avg  # Add F here if not present
 from django.core.paginator import Paginator
 import random
 from django.http import JsonResponse

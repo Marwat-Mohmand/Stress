@@ -54,22 +54,52 @@
         <div class="resources-grid">
             {% for resource in latest_resources %}
             <div class="resource-card">
-                {% if resource.cover_image %}
-                <img src="{{ resource.cover_image.url }}" alt="{{ resource.title }}" class="resource-image">
-                {% else %}
-                <div class="resource-image-placeholder">
-                    <i class="fas fa-brain"></i>
+                <div class="resource-icon-large">
+                    {% if resource.resource_type == 'meditation' %}
+                        <i class="fas fa-brain" style="color: #9f7aea; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'article' %}
+                        <i class="fas fa-file-alt" style="color: #4299e1; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'video' %}
+                        <i class="fas fa-video" style="color: #ed8936; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'audio' %}
+                        <i class="fas fa-headphones" style="color: #48bb78; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'exercise' %}
+                        <i class="fas fa-heartbeat" style="color: #f56565; font-size: 2.5rem;"></i>
+                    {% else %}
+                        <i class="fas fa-book-open" style="color: #667eea; font-size: 2.5rem;"></i>
+                    {% endif %}
                 </div>
-                {% endif %}
                 <div class="resource-info">
                     <h3>
                         <a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a>
                     </h3>
                     <div class="resource-meta">
-                        <span><i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}</span>
-                        <span><i class="far fa-clock"></i> {{ resource.duration }} мин</span>
-                        <span><i class="fas fa-tag"></i> {{ resource.get_resource_type_display }}</span>
+                        <span class="meta-item">
+                            <i class="fas fa-user-md" style="color: #667eea;"></i>
+                            {{ resource.expert.name|default:"Нет эксперта" }}
+                        </span>
+                        <span class="meta-item">
+                            <i class="far fa-clock" style="color: #667eea;"></i>
+                            {{ resource.duration }} мин
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-tag" style="color: #667eea;"></i>
+                            {{ resource.get_resource_type_display }}
+                        </span>
                     </div>
+                    {% if resource.difficulty_level %}
+                    <div class="difficulty-badge-wrapper">
+                        <span class="difficulty-badge difficulty-{{ resource.difficulty_level }}">
+                            {% if resource.difficulty_level == 'beginner' %}
+                                <i class="fas fa-seedling"></i> Начинающий
+                            {% elif resource.difficulty_level == 'intermediate' %}
+                                <i class="fas fa-chart-line"></i> Средний
+                            {% elif resource.difficulty_level == 'advanced' %}
+                                <i class="fas fa-star"></i> Продвинутый
+                            {% endif %}
+                        </span>
+                    </div>
+                    {% endif %}
                     <div class="resource-actions">
                         <button class="favorite-btn" data-id="{{ resource.id }}" data-type="resource">
                             <i class="far fa-heart"></i> В избранное
@@ -94,20 +124,38 @@
         <div class="resources-grid">
             {% for resource in popular_resources %}
             <div class="resource-card">
-                {% if resource.cover_image %}
-                <img src="{{ resource.cover_image.url }}" alt="{{ resource.title }}" class="resource-image">
-                {% else %}
-                <div class="resource-image-placeholder">
-                    <i class="fas fa-star"></i>
+                <div class="resource-icon-large">
+                    {% if resource.resource_type == 'meditation' %}
+                        <i class="fas fa-brain" style="color: #9f7aea; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'article' %}
+                        <i class="fas fa-file-alt" style="color: #4299e1; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'video' %}
+                        <i class="fas fa-video" style="color: #ed8936; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'audio' %}
+                        <i class="fas fa-headphones" style="color: #48bb78; font-size: 2.5rem;"></i>
+                    {% elif resource.resource_type == 'exercise' %}
+                        <i class="fas fa-heartbeat" style="color: #f56565; font-size: 2.5rem;"></i>
+                    {% else %}
+                        <i class="fas fa-book-open" style="color: #667eea; font-size: 2.5rem;"></i>
+                    {% endif %}
                 </div>
-                {% endif %}
                 <div class="resource-info">
                     <h3>
                         <a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a>
                     </h3>
                     <div class="resource-meta">
-                        <span><i class="fas fa-eye"></i> {{ resource.views_count }} просмотров</span>
-                        <span><i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}</span>
+                        <span class="meta-item">
+                            <i class="fas fa-eye" style="color: #667eea;"></i>
+                            {{ resource.views_count }} просмотров
+                        </span>
+                        <span class="meta-item">
+                            <i class="fas fa-user-md" style="color: #667eea;"></i>
+                            {{ resource.expert.name|default:"Нет эксперта" }}
+                        </span>
+                        <span class="meta-item">
+                            <i class="far fa-clock" style="color: #667eea;"></i>
+                            {{ resource.duration }} мин
+                        </span>
                     </div>
                     <div class="resource-actions">
                         <button class="favorite-btn" data-id="{{ resource.id }}" data-type="resource">
@@ -143,7 +191,7 @@
                 <div class="expert-stats">
                     <span><i class="fas fa-book-open"></i> {{ expert.resources_count }} ресурсов</span>
                 </div>
-                <a href="{% url 'expert-detail' expert.id %}" class="btn-outline">Подробнее</a>
+                <a href="{% url 'expert-list' %}" class="btn-outline">Смотреть всех →</a>
             </div>
             {% endfor %}
         </div>
@@ -173,7 +221,7 @@
 </section>
 {% endif %}
 
-<!-- Populate Database Message -->
+<!-- Database Stats -->
 <div style="text-align: center; margin: 20px 0; padding: 20px; background: #f7fafc; border-radius: 12px;">
     <p><i class="fas fa-database"></i> В базе данных: <strong>{{ total_resources }}</strong> ресурсов, 
     <strong>{{ total_experts }}</strong> экспертов, 
@@ -183,7 +231,6 @@
 
 {% block extra_js %}
 <script>
-// Favorite button functionality (JavaScript for frontend, will be connected to database later)
 document.querySelectorAll('.favorite-btn').forEach(btn => {
     btn.addEventListener('click', function() {
         const icon = this.querySelector('i');
@@ -192,13 +239,11 @@ document.querySelectorAll('.favorite-btn').forEach(btn => {
             icon.classList.add('fas');
             icon.style.color = '#f56565';
             this.style.background = '#fff5f5';
-            // Here you would send AJAX request to save to database
             console.log('Added to favorites:', this.dataset.id);
         } else {
             icon.classList.remove('fas');
             icon.classList.add('far');
             icon.style.color = '#cbd5e0';
-            // Here you would send AJAX request to remove from database
             console.log('Removed from favorites:', this.dataset.id);
         }
     });
