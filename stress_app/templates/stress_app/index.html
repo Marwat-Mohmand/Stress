@@ -71,7 +71,7 @@
                 </div>
                 <div class="resource-info">
                     <h3>
-                        <a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a>
+              <a href="{% url 'resource-detail' resource.id %}">{{ resource.title }}</a>
                     </h3>
                     <div class="resource-meta">
                         <span class="meta-item">
@@ -141,7 +141,7 @@
                 </div>
                 <div class="resource-info">
                     <h3>
-                        <a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a>
+                       <a href="{% url 'resource-detail' resource.id %}">{{ resource.title }}</a>
                     </h3>
                     <div class="resource-meta">
                         <span class="meta-item">
@@ -211,7 +211,7 @@
                     <span><i class="fas fa-user-md"></i> {{ featured_resource.expert.name|default:"Эксперт" }}</span>
                     <span><i class="far fa-clock"></i> {{ featured_resource.duration }} мин</span>
                 </div>
-                <a href="{% url 'resource-detail-page' featured_resource.id %}" class="btn-primary">Читать далее →</a>
+            <a href="{% url 'resource-detail' featured_resource.id %}" class="btn-primary">Читать далее →</a>
             </div>
             {% if featured_resource.cover_image %}
             <img src="{{ featured_resource.cover_image.url }}" alt="{{ featured_resource.title }}" class="featured-image">

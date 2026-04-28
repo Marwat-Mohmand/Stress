@@ -7,7 +7,12 @@ urlpatterns = [
     # Main page
     path('', views.index, name='index'),
     path('search/', views.search, name='search'),
-    path('resource/<int:resource_id>/', views.resource_detail_page, name='resource-detail-page'),
+    
+    # Task 12: Resource CRUD URLs (separate page with object)
+    path('resource/<int:resource_id>/', views.resource_detail, name='resource-detail'),
+    path('resource/<int:resource_id>/edit/', views.resource_edit, name='resource-edit'),
+    path('resource/<int:resource_id>/delete/', views.resource_delete, name='resource-delete'),
+    path('resource/add/', views.resource_add, name='resource-add'),
     
     # Statistics and API
     path('demo/groups/statistics/', views.group_statistics, name='group-statistics'),
@@ -28,25 +33,3 @@ urlpatterns = [
     path('demo/experts/edit/<int:expert_id>/', views.edit_expert, name='edit-expert'),
     path('demo/experts/delete/<int:expert_id>/', views.delete_expert, name='delete-expert'),
 ]
-
-
-# from django.urls import path
-# from . import views  # This imports views from the current app
-
-# urlpatterns = [
-#     # List views
-#     path('demo/resources/', views.resource_list, name='resource-list'),
-#     path('demo/groups/', views.group_list, name='group-list'),
-#     path('demo/experts/', views.expert_crud_demo, name='expert-list'),
-
-#     # CRUD operations for Experts
-#     path('demo/experts/add/', views.add_expert, name='add-expert'),
-#     path('demo/experts/edit/<int:expert_id>/', views.edit_expert, name='edit-expert'),
-#     path('demo/experts/delete/<int:expert_id>/', views.delete_expert, name='delete-expert'),
-
-#     # Group member management
-#     path('demo/group/<int:group_id>/add-member/', views.add_group_member, name='add-group-member'),
-#     path('demo/group/<int:group_id>/remove-member/<int:user_id>/', views.remove_group_member, name='remove-group-member'),
-
-
-# ]

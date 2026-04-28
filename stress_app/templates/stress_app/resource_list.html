@@ -10,8 +10,8 @@
         <span>Количество запросов к БД: <strong>{{ num_queries }}</strong></span>
     </div>
 
-    <div style="margin-bottom: 20px; display: flex; justify-content: flex-end;">
-        <a href="{% url 'add-resource' %}" class="btn-action btn-primary" style="padding: 12px 25px; background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+    <div>
+        <a href="{% url 'resource-add' %}" class="btn-add-resource" style="background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; padding: 12px 25px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
             <i class="fas fa-plus-circle"></i> Добавить ресурс
         </a>
     </div>
@@ -27,78 +27,72 @@
     Все ресурсы ({{ resources|length }})
 </h2>
 
-<div class="resources-grid">
-    
+<div class="resources-list-container">
     {% for resource in resources %}
-    <div class="resource-card">
-        <div class="resource-icon">
+    <div class="resource-item">
+        <!-- Left side - Icon -->
+        <div class="resource-item-icon">
             {% if resource.resource_type == 'meditation' %}
                 <i class="fas fa-brain" style="color: #9f7aea;"></i>
             {% elif resource.resource_type == 'article' %}
                 <i class="fas fa-file-alt" style="color: #4299e1;"></i>
             {% elif resource.resource_type == 'video' %}
                 <i class="fas fa-video" style="color: #ed8936;"></i>
+            {% elif resource.resource_type == 'audio' %}
+                <i class="fas fa-headphones" style="color: #48bb78;"></i>
             {% elif resource.resource_type == 'exercise' %}
                 <i class="fas fa-heartbeat" style="color: #f56565;"></i>
             {% else %}
-                <i class="fas fa-music" style="color: #48bb78;"></i>
+                <i class="fas fa-book-open" style="color: #667eea;"></i>
             {% endif %}
         </div>
         
-        <div class="resource-content">
-            <h3 class="resource-title">{{ resource.title }}</h3>
+        <!-- Middle - Content -->
+        <div class="resource-item-content">
+            <h3 class="resource-item-title">
+                <a href="{% url 'resource-detail' resource.id %}">{{ resource.title }}</a>
+            </h3>
             
-            <div class="resource-meta">
-                <span class="meta-item">
-                    <i class="far fa-clock"></i>
-                    {{ resource.duration }} мин
+            <div class="resource-item-meta">
+                <span class="meta-tag">
+                    <i class="far fa-clock"></i> {{ resource.duration }} мин
                 </span>
-                
-                <span class="meta-item">
-                    <i class="fas fa-user-md"></i>
-                    {% if resource.expert %}
-                        {{ resource.expert.name }}
-                    {% else %}
-                        <em>Нет эксперта</em>
-                    {% endif %}
+                <span class="meta-tag">
+                    <i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}
                 </span>
-                
-                <span class="meta-item">
-                    <i class="fas fa-tag"></i>
-                    {{ resource.get_resource_type_display }}
+                <span class="meta-tag">
+                    <i class="fas fa-tag"></i> {{ resource.get_resource_type_display }}
                 </span>
-                
                 {% if resource.difficulty_level %}
-                <span class="difficulty-badge difficulty-{{ resource.difficulty_level }}">
-                    {% if resource.difficulty_level == 'beginner' %}Начинающий
-                    {% elif resource.difficulty_level == 'intermediate' %}Средний
-                    {% elif resource.difficulty_level == 'advanced' %}Продвинутый
+                <span class="difficulty-tag difficulty-{{ resource.difficulty_level }}">
+                    {% if resource.difficulty_level == 'beginner' %}🌱 Начинающий
+                    {% elif resource.difficulty_level == 'intermediate' %}📈 Средний
+                    {% elif resource.difficulty_level == 'advanced' %}⭐ Продвинутый
                     {% endif %}
                 </span>
                 {% endif %}
             </div>
             
             {% if resource.expert %}
-            <div class="expert-info">
-                <img src="https://ui-avatars.com/api/?name={{ resource.expert.name|urlencode }}&background=667eea&color=fff&size=32" alt="{{ resource.expert.name }}" class="expert-avatar">
-                <div class="expert-details">
-                    <span class="expert-name">{{ resource.expert.name }}</span>
-                    <span class="expert-specialty">{{ resource.expert.specialty|default:"Специалист" }}</span>
-                </div>
+            <div class="resource-item-expert">
+                <span class="expert-avatar-small">👤</span>
+                <span class="expert-name-small">{{ resource.expert.name }}</span>
+                <span class="expert-specialty-small">{{ resource.expert.specialty|default:"Специалист" }}</span>
             </div>
             {% endif %}
-            
-            <!-- EDIT AND DELETE BUTTONS - ADDED HERE -->
-            <div class="resource-actions" style="margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; border-top: 1px solid #e2e8f0; padding-top: 15px;">
-                <a href="{% url 'edit-resource' resource.id %}" style="background: #4299e1; color: white; padding: 8px 20px; border-radius: 50px; text-decoration: none; font-size: 0.9em; display: inline-flex; align-items: center; gap: 5px;">
-                    <i class="fas fa-edit"></i> Редактировать
-                </a>
-                <a href="{% url 'delete-resource' resource.id %}" style="background: #f56565; color: white; padding: 8px 20px; border-radius: 50px; text-decoration: none; font-size: 0.9em; display: inline-flex; align-items: center; gap: 5px;" onclick="return confirm('Удалить ресурс &quot;{{ resource.title }}&quot;?')">
-                    <i class="fas fa-trash"></i> Удалить
-                </a>
-            </div>
-            <!-- END OF EDIT/DELETE BUTTONS -->
-            
+        </div>
+        
+        <!-- Right side - Buttons -->
+        <div class="resource-item-actions">
+            <a href="{% url 'resource-detail' resource.id %}" class="btn-view">
+                <i class="fas fa-eye"></i> Просмотр
+            </a>
+            <a href="{% url 'edit-resource' resource.id %}" class="btn-edit">
+                <i class="fas fa-edit"></i> Редактировать
+            </a>
+            <a href="{% url 'delete-resource' resource.id %}" class="btn-delete" onclick="return confirm('Удалить ресурс?')">
+                <i class="fas fa-trash"></i> Удалить
+            </a>
         </div>
     </div>
     {% empty %}
@@ -110,7 +104,7 @@
 </div>
 
 <!-- Info Card about select_related -->
-<div class="info-card" style="margin-top: 40px;">
+<div class="info-card">
     <div class="info-icon">
         <i class="fas fa-code"></i>
     </div>
@@ -133,4 +127,241 @@
         </div>
     </div>
 </div>
+
+<style>
+/* Resource List Styles */
+.resources-list-container {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    margin-bottom: 30px;
+}
+
+.resource-item {
+    background: white;
+    border-radius: 16px;
+    padding: 20px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+    border: 1px solid #e2e8f0;
+    transition: all 0.3s ease;
+}
+
+.resource-item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.15);
+    border-color: #667eea;
+}
+
+.resource-item-icon {
+    flex-shrink: 0;
+    width: 60px;
+    height: 60px;
+    background: #f7fafc;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 28px;
+}
+
+.resource-item-content {
+    flex: 1;
+    min-width: 0;
+}
+
+.resource-item-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin-bottom: 10px;
+}
+
+.resource-item-title a {
+    color: #2d3748;
+    text-decoration: none;
+}
+
+.resource-item-title a:hover {
+    color: #667eea;
+}
+
+.resource-item-meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.meta-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 0.75rem;
+    color: #718096;
+    background: #f7fafc;
+    padding: 4px 10px;
+    border-radius: 50px;
+}
+
+.meta-tag i {
+    color: #667eea;
+}
+
+.difficulty-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 50px;
+    font-size: 0.7rem;
+    font-weight: 500;
+}
+
+.difficulty-beginner {
+    background: #c6f6d5;
+    color: #22543d;
+}
+
+.difficulty-intermediate {
+    background: #feebc8;
+    color: #7b341e;
+}
+
+.difficulty-advanced {
+    background: #fed7d7;
+    color: #742a2a;
+}
+
+.resource-item-expert {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.8rem;
+    color: #718096;
+    margin-top: 8px;
+    padding-top: 8px;
+    border-top: 1px solid #e2e8f0;
+}
+
+.expert-avatar-small {
+    width: 24px;
+    height: 24px;
+    background: #e2e8f0;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+}
+
+.expert-name-small {
+    font-weight: 600;
+    color: #2d3748;
+}
+
+.expert-specialty-small {
+    font-size: 0.7rem;
+    color: #a0aec0;
+}
+
+.resource-item-actions {
+    flex-shrink: 0;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.btn-view, .btn-edit, .btn-delete {
+    padding: 6px 14px;
+    border-radius: 50px;
+    text-decoration: none;
+    font-size: 0.75rem;
+    font-weight: 500;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: all 0.2s;
+}
+
+.btn-view {
+    background: #667eea;
+    color: white;
+}
+
+.btn-view:hover {
+    background: #5a67d8;
+    transform: translateY(-1px);
+}
+
+.btn-edit {
+    background: #4299e1;
+    color: white;
+}
+
+.btn-edit:hover {
+    background: #3182ce;
+    transform: translateY(-1px);
+}
+
+.btn-delete {
+    background: #f56565;
+    color: white;
+}
+
+.btn-delete:hover {
+    background: #e53e3e;
+    transform: translateY(-1px);
+}
+
+.btn-add-resource:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 10px rgba(72, 187, 120, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .resource-item {
+        flex-direction: column;
+        text-align: center;
+    }
+    
+    .resource-item-icon {
+        margin: 0 auto;
+    }
+    
+    .resource-item-meta {
+        justify-content: center;
+    }
+    
+    .resource-item-actions {
+        justify-content: center;
+        width: 100%;
+    }
+    
+    .demo-header {
+        flex-direction: column;
+        align-items: stretch;
+    }
+    
+    .demo-header > div {
+        text-align: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .resource-item-actions {
+        flex-direction: column;
+    }
+    
+    .btn-view, .btn-edit, .btn-delete {
+        justify-content: center;
+    }
+    
+    .meta-tag {
+        font-size: 0.65rem;
+        padding: 3px 8px;
+    }
+}
+</style>
 {% endblock %}

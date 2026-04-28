@@ -1,6 +1,5 @@
 <!DOCTYPE html>
 {% load static %} 
-{% load static %}
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -13,47 +12,51 @@
 <body>
     <div class="wrapper">
         <!-- Header with navigation -->
-       <!-- In base.html, update navigation -->
-<header class="main-header">
-    <div class="container">
-        <div class="logo">
-            <i class="fas fa-brain"></i>
-            <a href="{% url 'index' %}" style="text-decoration: none; color: white;">
-                <h1>Управление стрессом</h1>
-            </a>
-        </div>
-  
-    </div>
-</header>
+        <header class="main-header">
+            <div class="container">
+                <div class="logo">
+                    <i class="fas fa-brain"></i>
+                    <a href="{% url 'index' %}" style="text-decoration: none; color: white;">
+                        <h1>Управление стрессом</h1>
+                    </a>
+                </div>
+            </div>
+        </header>
 
         <!-- Navigation tabs -->
-<div class="nav-tabs container">
-    <a href="{% url 'index' %}" class="tab {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
-        <i class="fas fa-home"></i>
-        <span>Главная</span>
-        <small>главная страница</small>
-    </a>
-    <a href="{% url 'resource-list' %}" class="tab {% if request.resolver_match.url_name == 'resource-list' %}active{% endif %}">
-        <i class="fas fa-book-open"></i>
-        <span>Ресурсы</span>
-        <small>select_related</small>
-    </a>
-    <a href="{% url 'group-list' %}" class="tab {% if request.resolver_match.url_name == 'group-list' %}active{% endif %}">
-        <i class="fas fa-users"></i>
-        <span>Группы</span>
-        <small>prefetch_related</small>
-    </a>
-    <a href="{% url 'expert-list' %}" class="tab {% if request.resolver_match.url_name == 'expert-list' %}active{% endif %}">
-        <i class="fas fa-user-md"></i>
-        <span>Эксперты</span>
-        <small>CRUD операции</small>
-    </a>
-    <a href="/admin/" class="tab" target="_blank">
-        <i class="fas fa-cog"></i>
-        <span>Админ</span>
-        <small>панель</small>
-    </a>
-</div>
+        <div class="nav-tabs container">
+            <a href="{% url 'index' %}" class="tab {% if request.resolver_match.url_name == 'index' %}active{% endif %}">
+                <i class="fas fa-home"></i>
+                <span>Главная</span>
+                <small>главная страница</small>
+            </a>
+            <a href="{% url 'resource-list' %}" class="tab {% if request.resolver_match.url_name == 'resource-list' %}active{% endif %}">
+                <i class="fas fa-book-open"></i>
+                <span>Ресурсы</span>
+                <small>select_related</small>
+            </a>
+            <!-- Task 12: Add Resource Button in Navigation -->
+            <a href="{% url 'resource-add' %}" class="tab">
+                <i class="fas fa-plus-circle"></i>
+                <span>Добавить</span>
+                <small>новый ресурс</small>
+            </a>
+            <a href="{% url 'group-list' %}" class="tab {% if request.resolver_match.url_name == 'group-list' %}active{% endif %}">
+                <i class="fas fa-users"></i>
+                <span>Группы</span>
+                <small>prefetch_related</small>
+            </a>
+            <a href="{% url 'expert-list' %}" class="tab {% if request.resolver_match.url_name == 'expert-list' %}active{% endif %}">
+                <i class="fas fa-user-md"></i>
+                <span>Эксперты</span>
+                <small>CRUD операции</small>
+            </a>
+            <a href="/admin/" class="tab" target="_blank">
+                <i class="fas fa-cog"></i>
+                <span>Админ</span>
+                <small>панель</small>
+            </a>
+        </div>
 
         <!-- Main content -->
         <main class="main-content container">

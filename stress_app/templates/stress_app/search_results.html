@@ -25,7 +25,7 @@
         <div class="resources-grid" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px;">
             {% for resource in resources_results %}
             <div class="resource-card" style="background: white; border-radius: 12px; padding: 15px; box-shadow: 0 2px 5px rgba(0,0,0,0.1);">
-                <h3><a href="{% url 'resource-detail-page' resource.id %}">{{ resource.title }}</a></h3>
+              <h3><a href="{% url 'resource-detail' resource.id %}">{{ resource.title }}</a></h3>
                 <p>{{ resource.content|truncatewords:20 }}</p>
                 <div style="margin-top: 10px; color: #718096; font-size: 0.9rem;">
                     <span><i class="fas fa-user-md"></i> {{ resource.expert.name|default:"Нет эксперта" }}</span>

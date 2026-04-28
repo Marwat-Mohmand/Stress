@@ -412,3 +412,125 @@ def api_group_data(request):
         'using_values_list': list(group_names),
         'count_total': groups_data.count(),
     }, json_dumps_params={'ensure_ascii': False})
+
+# ========== TASK 12: NEW CRUD FUNCTIONS ==========
+
+def resource_detail(request, resource_id):
+    """
+    Display single resource with related data (Task 12 - Requirement 3 & 4)
+    URL: /resource/1309570/ where 1309570 is the ID
+    """
+    from django.http import Http404
+    
+    try:
+        resource = Resource.objects.select_related('expert', 'category').get(id=resource_id)
+        # Increment views count using F expression
+        Resource.objects.filter(id=resource_id).update(views_count=F('views_count') + 1)
+        resource.refresh_from_db()
+    except Resource.DoesNotExist:
+        raise Http404("Ресурс не найден")
+    
+    # Get related resources (same category)
+    related_resources = Resource.objects.filter(
+        category=resource.category,
+        is_published=True
+    ).exclude(id=resource_id)[:4]
+    
+    return render(request, 'stress_app/resource_detail.html', {
+        'resource': resource,
+        'related_resources': related_resources,
+    })
+
+
+def resource_edit(request, resource_id):
+    """
+    Edit resource functionality (Task 12 - Requirement 5)
+    """
+    resource = get_object_or_404(Resource, id=resource_id)
+    experts = Expert.objects.all()
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        resource.title = request.POST.get('title')
+        resource.content = request.POST.get('content')
+        resource.resource_type = request.POST.get('resource_type')
+        resource.duration = request.POST.get('duration')
+        resource.difficulty_level = request.POST.get('difficulty_level')
+        
+        expert_id = request.POST.get('expert')
+        category_id = request.POST.get('category')
+        
+        if expert_id:
+            resource.expert = Expert.objects.get(id=expert_id)
+        if category_id:
+            resource.category = Category.objects.get(id=category_id)
+        
+        resource.save()
+        messages.success(request, f'Ресурс "{resource.title}" успешно обновлен!')
+        return redirect('resource-detail', resource_id=resource.id)
+    
+    context = {
+        'resource': resource,
+        'experts': experts,
+        'categories': categories,
+        'resource_types': Resource.RESOURCE_TYPES,
+        'difficulty_levels': Resource.DIFFICULTY_LEVELS,
+    }
+    return render(request, 'stress_app/resource_edit.html', context)
+
+
+def resource_delete(request, resource_id):
+    """
+    Delete resource functionality (Task 12 - Requirement 6)
+    """
+    resource = get_object_or_404(Resource, id=resource_id)
+    
+    if request.method == 'POST':
+        resource_title = resource.title
+        resource.delete()
+        messages.success(request, f'Ресурс "{resource_title}" успешно удален!')
+        return redirect('resource-list')
+    
+    return render(request, 'stress_app/resource_delete.html', {'resource': resource})
+
+
+def resource_add(request):
+    """
+    Add new resource functionality (Task 12 - Requirement 7)
+    """
+    experts = Expert.objects.all()
+    categories = Category.objects.all()
+    
+    if request.method == 'POST':
+        title = request.POST.get('title')
+        content = request.POST.get('content')
+        resource_type = request.POST.get('resource_type')
+        duration = request.POST.get('duration')
+        difficulty_level = request.POST.get('difficulty_level')
+        
+        expert_id = request.POST.get('expert')
+        category_id = request.POST.get('category')
+        
+        expert = Expert.objects.get(id=expert_id) if expert_id else None
+        category = Category.objects.get(id=category_id) if category_id else None
+        
+        resource = Resource.objects.create(
+            title=title,
+            content=content,
+            resource_type=resource_type,
+            expert=expert,
+            category=category,
+            duration=duration,
+            difficulty_level=difficulty_level,
+            is_published=True
+        )
+        messages.success(request, f'Ресурс "{title}" успешно добавлен!')
+        return redirect('resource-detail', resource_id=resource.id)
+    
+    context = {
+        'experts': experts,
+        'categories': categories,
+        'resource_types': Resource.RESOURCE_TYPES,
+        'difficulty_levels': Resource.DIFFICULTY_LEVELS,
+    }
+    return render(request, 'stress_app/resource_add.html', context)

@@ -6,11 +6,33 @@
 {% block content %}
 <div class="container" style="padding: 40px 20px;">
     <!-- Back button -->
-    <div style="margin-bottom: 30px;">
+    <div style="margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center;">
         <a href="{% url 'index' %}" style="color: #667eea; text-decoration: none;">
             ← Назад на главную
         </a>
+        
+        <!-- Task 12: CRUD Action Buttons -->
+        <div style="display: flex; gap: 15px;">
+            <a href="{% url 'resource-add' %}" class="btn-add" style="background: #48bb78; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-plus"></i> Добавить
+            </a>
+            <a href="{% url 'resource-edit' resource.id %}" class="btn-edit" style="background: #4299e1; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;">
+                <i class="fas fa-edit"></i> Редактировать
+            </a>
+            <a href="{% url 'resource-delete' resource.id %}" class="btn-delete" style="background: #f56565; color: white; padding: 10px 25px; border-radius: 50px; text-decoration: none; display: inline-flex; align-items: center; gap: 8px;" onclick="return confirm('Удалить ресурс {{ resource.title }}?')">
+                <i class="fas fa-trash"></i> Удалить
+            </a>
+        </div>
     </div>
+
+    <!-- Success/Error Messages -->
+    {% if messages %}
+        {% for message in messages %}
+        <div class="alert" style="padding: 15px; margin-bottom: 20px; border-radius: 8px; background: {% if message.tags == 'success' %}#48bb78{% else %}#f56565{% endif %}; color: white;">
+            {{ message }}
+        </div>
+        {% endfor %}
+    {% endif %}
 
     <!-- Resource Header -->
     <div class="resource-header" style="display: flex; flex-wrap: wrap; gap: 30px; margin-bottom: 40px;">
@@ -85,7 +107,7 @@
             {% for related in related_resources %}
             <div style="background: white; border: 1px solid #e2e8f0; border-radius: 12px; padding: 15px;">
                 <h3 style="font-size: 1.1em; margin-bottom: 10px;">
-                    <a href="{% url 'resource-detail-page' related.id %}" style="color: #2d3748; text-decoration: none;">
+                 <a href="{% url 'resource-detail' related.id %}" style="color: #2d3748; text-decoration: none;">
                         {{ related.title }}
                     </a>
                 </h3>
